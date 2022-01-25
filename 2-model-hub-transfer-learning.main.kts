@@ -33,8 +33,8 @@ val imageSize = 224L
 val numberOfClasses = 10
 
 val modelHub = TFModelHub(cacheDirectory = File("cache/pretrainedModels"))
-val mobileNetV2ModelType = TFModels.CV.MobileNetV2
-val model = modelHub.loadModel(mobileNetV2ModelType)
+val tfModelType = TFModels.CV.ResNet18
+val model = modelHub.loadModel(tfModelType)
 
 val dogsVsCatsPath = dogsCatsSmallDatasetPath()
 
@@ -54,17 +54,12 @@ val preprocessing: Preprocessing = preprocess {
     }
     transformTensor {
         sharpen {
-            this.modelType = mobileNetV2ModelType
+            this.modelType = tfModelType
         }
     }
 }
 
-val dataset = OnHeapDataset.create(preprocessing).shuffle()
-val (train, test) = dataset.split(.7)
-
 model.use {
-    it.layers.last().isTrainable = true
-
     it.compile(
         optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
@@ -79,17 +74,22 @@ model.layers.forEach { layer ->
     layers.add(layer)
 }
 
-val lastLayer = layers.last()
+val lastLayer = layers.last { it.name == "fc1" }
 lastLayer.inboundLayers.forEach { inboundLayer ->
     inboundLayer.outboundLayers.remove(lastLayer)
 }
 
 layers.removeLast()
 
-var x = Dense(name = "top_dense", outputSize = 200, activation = Activations.Selu)(lastLayer)
+var x = Dense(name = "top_dense", outputSize = 50, activation = Activations.Selu)(layers.last { it.name == "pool1" })
+x = Dense(name = "top_dense_2", outputSize = 20, activation = Activations.Selu)(x)
 x = Dense(name = "pred", outputSize = 2, activation = Activations.Softmax)(x)
 
 val modelWithCustomTop = Functional.fromOutput(x)
+
+val dataset = OnHeapDataset.create(preprocessing).shuffle()
+val (trainVal, test) = dataset.split(.8)
+val (train, validation) = trainVal.split(.8)
 
 modelWithCustomTop.use {
     it.compile(
@@ -100,19 +100,21 @@ modelWithCustomTop.use {
 
     it.printSummary()
 
-    val modelWeights = modelHub.loadWeights(mobileNetV2ModelType)
+    val modelWeights = modelHub.loadWeights(tfModelType)
     it.loadWeightsForFrozenLayers(modelWeights)
 
-    val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]
+    val accuracyBeforeTraining = it.evaluate(dataset = test, batchSize = 16).lossValue
     println("Accuracy before fine-tuning $accuracyBeforeTraining")
 
     it.fit(
-        dataset = train,
-        batchSize = 8,
-        epochs = 3
+        trainingDataset = train,
+        validationDataset = validation,
+        trainBatchSize = 8,
+        validationBatchSize = 8,
+        epochs = 20
     )
 
-    val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 16).metrics[Metrics.ACCURACY]
+    val accuracyAfterTraining = it.evaluate(dataset = test, batchSize = 16).lossValue
 
     println("Accuracy after fine-tuning $accuracyAfterTraining")
 }
