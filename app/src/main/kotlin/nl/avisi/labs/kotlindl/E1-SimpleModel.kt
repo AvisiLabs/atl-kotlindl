@@ -14,9 +14,11 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.api.core.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.mnist
 
 object E1Constants {
     const val IMAGE_SIZE = 28L
+    const val BATCH_SIZE = 500
     const val NUMBER_OF_CLASSES = 10
 }
 
@@ -41,7 +43,7 @@ private fun createModel() = Sequential.of(
 )
 
 private fun getTrainValidationTestDatasets(validationSplit: Double): Triple<OnHeapDataset, OnHeapDataset, OnHeapDataset> {
-    val (trainVal, test) = org.jetbrains.kotlinx.dl.dataset.mnist()
+    val (trainVal, test) = mnist()
 
     val (train, validation) = trainVal.split(1.0 - validationSplit)
     return Triple(train, validation, test)
@@ -60,13 +62,13 @@ private fun GraphTrainableModel.trainUsingDatasets(trainData: OnHeapDataset, val
         trainingDataset = trainData,
         validationDataset = validationData,
         epochs = 3,
-        trainBatchSize = 500,
-        validationBatchSize = 500
+        trainBatchSize = E1Constants.BATCH_SIZE,
+        validationBatchSize = E1Constants.BATCH_SIZE
     )
 }
 
 private fun GraphTrainableModel.evaluateUsingDataset(testData: OnHeapDataset) {
-    val testResults = this.evaluate(dataset = testData, batchSize = 500)
+    val testResults = this.evaluate(dataset = testData, batchSize = E1Constants.BATCH_SIZE)
 
     val accuracy = testResults.metrics[Metrics.ACCURACY]
     val loss = testResults.lossValue
