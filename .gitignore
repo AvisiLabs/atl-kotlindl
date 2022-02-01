@@ -1,4 +1,6 @@
-/cache/
+cache/
 .idea
 *.iml
 *.svg
+build/
+.gradle/
