@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.api.core.summary.printSummary
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.mnist
@@ -51,7 +50,7 @@ private fun getTrainValidationTestDatasets(validationSplit: Double): Triple<OnHe
 
 private fun GraphTrainableModel.trainUsingDatasets(trainData: OnHeapDataset, validationData: OnHeapDataset) {
     this.compile(
-        optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+        optimizer = Adam(),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
         metric = Metrics.ACCURACY
     )
