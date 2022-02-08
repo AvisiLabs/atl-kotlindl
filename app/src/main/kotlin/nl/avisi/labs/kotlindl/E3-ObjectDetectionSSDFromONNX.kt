@@ -65,7 +65,7 @@ private fun visualise(
 }
 
 class JPanel(
-    val image: File,
+    image: File,
     private val detectedObjects: List<DetectedObject>
 ) : Component() {
     companion object {
@@ -73,7 +73,7 @@ class JPanel(
         private const val HEIGHT = 600
     }
 
-    private var bufferedImage = ImageIO.read(image)
+    private val bufferedImage = ImageIO.read(image)
 
     override fun paint(graphics: Graphics) {
         super.paint(graphics)
