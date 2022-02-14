@@ -28,13 +28,14 @@ model = tf.keras.models.Sequential([
 ])
  */
 fun main() {
-    val image = ImageConverter.toBufferedImage(Sequential::class.java.classLoader.getResourceAsStream(E6Constants.IMAGE_RESOURCE_PATH)!!).resizeToGrayscale(28, 28)
+    val image = ImageConverter.toBufferedImage(Sequential::class.java.classLoader.getResourceAsStream(E6Constants.IMAGE_RESOURCE_PATH)!!)
+        .resizeToGrayscale(28, 28)
     val imageArray = OnHeapDataset.toNormalizedVector((image.raster.dataBuffer as DataBufferByte).data)
     Sequential.loadModelConfiguration(File(E6Constants.MODEL_CONFIG_PATH)).use {
         it.compile(Adam(), Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS, Metrics.ACCURACY)
         it.loadWeights(HdfFile(File(E6Constants.MODEL_WEIGHTS_PATH)))
-        val predictions = it.predict(imageArray)
-        println(predictions)
+        val prediction = it.predict(imageArray)
+        println(prediction)
     }
 }
 
