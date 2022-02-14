@@ -11,8 +11,8 @@ import org.jetbrains.kotlinx.dl.dataset.image.ImageConverter
 import java.io.File
 
 object E5Constants {
-    const val MODEL_CONFIG_PATH = "./custom_model_h5/model.json"
-    const val MODEL_PATH = "./custom_model_h5/model_checkpoint.h5"
+    const val MODEL_CONFIG_PATH = "./models/custom_model_h5/model.json"
+    const val MODEL_PATH = "./models/custom_model_h5/model_checkpoint.h5"
     const val IMAGE_RESOURCE_PATH = "beer.jpg"
 }
 

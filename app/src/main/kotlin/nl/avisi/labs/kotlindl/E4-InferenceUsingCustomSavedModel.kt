@@ -12,7 +12,7 @@ Exception: Expects arg[0] to be uint8 but float is provided
 While it is possible to directly use TensorFlow, this is not in scope of these examples
  */
 fun main() {
-    val path = "./custom_model"
+    val path = "./models/custom_model"
     SavedModel.load(path).use {
         val image = it.loadImage("object-detection-image.jpg")
         it.reshape(image.width.toLong(), image.height.toLong(), 3L)
