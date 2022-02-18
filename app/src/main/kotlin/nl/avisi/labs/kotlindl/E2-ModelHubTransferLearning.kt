@@ -92,8 +92,8 @@ private fun createModelWithCustomClassifier(model: GraphTrainableModel): GraphTr
         }
     }
 
-    var x = Dense(name = "top_dense", outputSize = 30, activation = Activations.Selu)(layers.last())
-    x = Dense(name = "top_dense_2", outputSize = 20, activation = Activations.Selu)(x)
+    var x = Dense(name = "top_dense", outputSize = 30, activation = Activations.Relu)(layers.last())
+    x = Dense(name = "top_dense_2", outputSize = 20, activation = Activations.Relu)(x)
     x = Dense(name = "pred", outputSize = 2, activation = Activations.Softmax)(x)
 
     return Functional.fromOutput(x)

@@ -34,10 +34,10 @@ fun main() {
 
 private fun createModel() = Sequential.of(
     Input(dims = longArrayOf(E1Constants.IMAGE_SIZE, E1Constants.IMAGE_SIZE, 1)),
-    Conv2D(filters = 6, kernelSize = longArrayOf(5, 5), activation = Activations.Selu),
+    Conv2D(filters = 6, kernelSize = longArrayOf(5, 5), activation = Activations.Relu),
     AvgPool2D(poolSize = intArrayOf(1, 4, 4, 1)),
     Flatten(),
-    Dense(outputSize = 20, activation = Activations.Selu),
+    Dense(outputSize = 20, activation = Activations.Relu),
     Dense(outputSize = E1Constants.NUMBER_OF_CLASSES, activation = Activations.Softmax)
 )
 
