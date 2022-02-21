@@ -3,6 +3,9 @@ package nl.avisi.labs.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.GraphTrainableModel
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
+import org.jetbrains.kotlinx.dl.api.core.callback.Callback
+import org.jetbrains.kotlinx.dl.api.core.history.EpochTrainingEvent
+import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -75,7 +78,8 @@ private fun GraphTrainableModel.trainUsingDatasets(trainData: OnHeapDataset, val
     this.compile(
         optimizer = Adam(),
         loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-        metric = Metrics.ACCURACY
+        metric = Metrics.ACCURACY,
+        callback = LoggingCallback()
     )
 
     this.printSummary()
@@ -96,4 +100,12 @@ private fun GraphTrainableModel.evaluateUsingDataset(testData: OnHeapDataset) {
     val loss = testResults.lossValue
 
     println("Loss: $loss, accuracy: $accuracy")
+}
+
+class LoggingCallback : Callback() {
+    override fun onEpochEnd(epoch: Int, event: EpochTrainingEvent, logs: TrainingHistory) {
+        super.onEpochEnd(epoch, event, logs)
+
+        println("Epoch $epoch, loss: ${event.lossValue}, acc: ${event.metricValue}, val_loss: ${event.valLossValue}, val_acc: ${event.valMetricValue}")
+    }
 }
