@@ -46,8 +46,8 @@ private fun createModel(): GraphTrainableModel {
     val layers = buildList {
         add(Input(dims = longArrayOf(E1Constants.IMAGE_SIZE, E1Constants.IMAGE_SIZE, 1)))
 
-        repeat(2) {
-            val numberOfFilters = E1Constants.BASE_CONV_FILTERS * 2.0.pow(it).toLong()
+        repeat(2) { convolutionBlockNumber ->
+            val numberOfFilters = E1Constants.BASE_CONV_FILTERS * 2.0.pow(convolutionBlockNumber).toLong()
             add(
                 Conv2D(
                     filters = numberOfFilters,
