@@ -44,7 +44,7 @@ private fun SSDObjectDetectionModel.detectObjectsForImage(image: String) {
     val detectedObjects = this.detectObjects(imageFile = imageFile, topK = E3Constants.TOP_K)
 
     detectedObjects.forEach {
-        println("${it.classLabel}: ${it.probability}")
+        println("${it.classLabel} found at ${it.xMin} ${it.yMin} ${it.xMax} ${it.yMax} with probability ${it.probability}")
     }
 
     visualise(imageFile, detectedObjects)
