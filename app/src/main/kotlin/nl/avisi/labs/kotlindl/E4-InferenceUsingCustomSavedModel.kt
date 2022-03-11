@@ -10,6 +10,8 @@ import javax.imageio.ImageIO
 Does not work due to hardcoded types in predict function, cannot be easily changed.
 Exception: Expects arg[0] to be uint8 but float is provided
 While it is possible to directly use TensorFlow, this is not in scope of these examples
+
+Note: the model is excluded from the repository, but is a FasterRCNN model with ResNet-50 trained using the TensorFlow Object Detection API
  */
 fun main() {
     val path = "./models/custom_model"
