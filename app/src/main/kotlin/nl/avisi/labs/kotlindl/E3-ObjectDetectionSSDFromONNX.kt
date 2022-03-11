@@ -20,6 +20,7 @@ import javax.swing.JFrame
 
 object E3Constants {
     const val TOP_K = 10
+    const val EXAMPLE_IMAGE_RESOURCE_PATH = "object-detection-image.jpg"
 }
 
 fun main() {
@@ -27,7 +28,7 @@ fun main() {
     val model = getModelFromModelHub(modelType) as SSDObjectDetectionModel
 
     model.use {
-        it.detectObjectsForImage("object-detection-image.jpg")
+        it.detectObjectsForImage(E3Constants.EXAMPLE_IMAGE_RESOURCE_PATH)
     }
 }
 
