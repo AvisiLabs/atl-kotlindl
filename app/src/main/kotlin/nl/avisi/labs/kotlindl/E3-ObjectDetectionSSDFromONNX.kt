@@ -19,7 +19,7 @@ import javax.imageio.ImageIO
 import javax.swing.JFrame
 
 object E3Constants {
-    const val TOP_K = 10
+    const val TOP_K = 5
     const val EXAMPLE_IMAGE_RESOURCE_PATH = "object-detection-image.jpg"
 }
 
