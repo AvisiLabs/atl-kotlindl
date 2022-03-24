@@ -56,13 +56,15 @@ private fun visualise(
     imageFile: File,
     detectedObjects: List<DetectedObject>
 ) {
-    val frame = JFrame("Detected Objects")
-    frame.contentPane.add(JPanel(imageFile, detectedObjects))
-    frame.pack()
-    frame.setLocationRelativeTo(null)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.isResizable = false
+    JFrame("Detected objects").apply {
+        contentPane.add(JPanel(imageFile, detectedObjects))
+        pack()
+        setLocationRelativeTo(null)
+
+        isVisible = true
+        isResizable = true
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    }
 }
 
 class JPanel(
@@ -72,6 +74,9 @@ class JPanel(
     companion object {
         private const val WIDTH = 800
         private const val HEIGHT = 600
+        private const val LABEL_FONT = "Courier New"
+        private const val LABEL_SIZE = 17
+        private const val RECTANGLE_STROKE_WIDTH = 6f
     }
 
     private val bufferedImage = ImageIO.read(image)
@@ -82,33 +87,57 @@ class JPanel(
         graphics.drawImage(bufferedImage, 0, 0, WIDTH, HEIGHT, null)
 
         detectedObjects.forEach {
-            val top = it.yMin * HEIGHT
-            val left = it.xMin * WIDTH
-            val bottom = it.yMax * HEIGHT
-            val right = it.xMax * WIDTH
-
-            graphics.color = Color.ORANGE
-            graphics.font = Font("Courier New", 1, 17)
-            graphics.drawString(" ${it.classLabel} : ${it.probability}", left.toInt(), bottom.toInt() - 8)
-
-            graphics as Graphics2D
-            val stroke: Stroke = BasicStroke(6f)
-            graphics.color = when (it.classLabel) {
-                "person" -> Color.RED
-                "car" -> Color.GREEN
-                "bicycle" -> Color.MAGENTA
-                else -> Color.WHITE
-            }
-            graphics.stroke = stroke
-            graphics.drawRect(left.toInt(), bottom.toInt(), (right - left).toInt(), (top - bottom).toInt())
+            drawObject(graphics as Graphics2D, it)
         }
     }
 
-    override fun getPreferredSize(): Dimension {
-        return Dimension(WIDTH, HEIGHT)
+    private fun drawObject(graphics: Graphics2D, detectedObject: DetectedObject) {
+        val top = detectedObject.yMin * HEIGHT
+        val left = detectedObject.xMin * WIDTH
+        val bottom = detectedObject.yMax * HEIGHT
+        val right = detectedObject.xMax * WIDTH
+
+        drawLabelForObject(graphics, detectedObject, left, bottom)
+
+        drawRectangleForObject(graphics, detectedObject, left, bottom, right, top)
     }
 
-    override fun getMinimumSize(): Dimension {
-        return Dimension(WIDTH, HEIGHT)
+    private fun drawLabelForObject(
+        graphics: Graphics,
+        detectedObject: DetectedObject,
+        left: Float,
+        bottom: Float
+    ) {
+        graphics.color = Color.ORANGE
+        graphics.font = Font(LABEL_FONT, 1, LABEL_SIZE)
+        graphics.drawString(
+            " ${detectedObject.classLabel} : ${detectedObject.probability}",
+            left.toInt(),
+            bottom.toInt() - (LABEL_SIZE / 2)
+        )
     }
+
+    private fun drawRectangleForObject(
+        graphics: Graphics2D,
+        detectedObject: DetectedObject,
+        left: Float,
+        bottom: Float,
+        right: Float,
+        top: Float
+    ) {
+        val stroke: Stroke = BasicStroke(RECTANGLE_STROKE_WIDTH)
+        graphics.color = determineRectangleColorForObject(detectedObject)
+        graphics.stroke = stroke
+        graphics.drawRect(left.toInt(), bottom.toInt(), (right - left).toInt(), (top - bottom).toInt())
+    }
+
+    private fun determineRectangleColorForObject(detectedObject: DetectedObject) = when (detectedObject.classLabel) {
+        "person" -> Color.RED
+        "car" -> Color.GREEN
+        "bicycle" -> Color.MAGENTA
+        else -> Color.WHITE
+    }
+
+    override fun getPreferredSize(): Dimension = Dimension(WIDTH, HEIGHT)
+    override fun getMinimumSize(): Dimension = Dimension(WIDTH, HEIGHT)
 }
